@@ -9,7 +9,6 @@
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs explaining why this issue interests you, how it matches your skills/learning goals, what you hope to learn]
 This issue tackles adding support for newer Dune keywords such as parameters and library_parameter. This is important because users editing Dune files in Emacs don't have the best visual feedback currently, which makes configuration files harder to read and maintain. I chose this issue because its an approachable contribution to working on a developer tool, which is something I've always been interested in.
 
 ---
