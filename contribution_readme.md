@@ -2,7 +2,7 @@
 
 **Contribution Number:** 1 
 **Student:** Uzair Macy
-**Issue:** [[GitHub issue link]](https://github.com/medusajs/medusa/issues/14880)
+**Issue:** [[GitHub issue link](https://github.com/ocaml/dune/issues/12567)]
 **Status:** [Phase I]
 
 ---
@@ -17,19 +17,19 @@ This issue tackles adding support for newer Dune keywords such as parameters and
 
 ### Problem Description
 
-[In your own words, what's broken or missing?]
+The emacs dune-mode in dune.el doesn't highlight the OxCaml parameterized-library keywords (library_parameter, parameters, instantiate), because they were added to dune's grammar but never to the mode's keyword lists.
 
 ### Expected Behavior
 
-[What should happen?]
+library_parameter should highlight as a stanza (keyword-face), parameters as a field (function-name-face), and instantiate as a builtin (builtin-face), just like library, name, and file do.
 
 ### Current Behavior
 
-[What actually happens?]
+All three render as plain, unhighlighted text.
 
 ### Affected Components
 
-[Which parts of the codebase are involved?]
+Only the three hand-maintained regexp-opt lists in dune.el: dune-stanzas-regex (:59), dune-fields-regex (:71), dune-builtin-regex (:110).
 
 ---
 
@@ -42,12 +42,35 @@ This issue tackles adding support for newer Dune keywords such as parameters and
 ### Steps to Reproduce
 
 1. [Step 1]
+Run these commands in Powershell in this order (only tested with Windows):
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+irm get.scoop.sh | iex
+scoop bucket add extras
+scoop install emacs
+
 2. [Step 2]
+Create a file named dune with this content:
+(library_parameter
+ (name param))
+
+(library
+ (name lib)
+ (parameters param))
+
+(executable
+ (name bin)
+ (libraries (instantiate lib impl)))
+
+Then run:
+& "C:\Program Files\Emacs\emacs-30.2\bin\emacs.exe" -Q -L editor-integration/emacs -l dune.el dune
+
 3. [Observed result]
+
+executable, name, and libraries are colored, but library_parameter, parameters, and instantiate are plain white/default text.
 
 ### Reproduction Evidence
 
-- **Commit showing reproduction:** [Link to commit in your fork]
+- **Commit showing reproduction:** 
 - **Screenshots/logs:** [If applicable]
 - **My findings:** [What you discovered during reproduction]
 
@@ -65,22 +88,11 @@ This issue tackles adding support for newer Dune keywords such as parameters and
 
 ### Implementation Plan
 
-Using UMPIRE framework (adapted):
+Add the three OxCaml parameterised-library keywords to the corresponding regexp-opt keyword lists in dune.el, mirroring how the existing virtual-library keyword implements is handled:
 
-**Understand:** [Restate the problem]
-
-**Match:** [What similar patterns/solutions exist in the codebase?]
-
-**Plan:** [Step-by-step implementation plan]
-1. [Modify file X to do Y]
-2. [Add function Z]
-3. [Update tests]
-
-**Implement:** [Link to your branch/commits as you work]
-
-**Review:** [Self-review checklist - does it follow the project's contribution guidelines?]
-
-**Evaluate:** [How will you verify it works?]
+library_parameter → add to dune-stanzas-regex (dune.el:62-67) so it highlights as a stanza (keyword-face) and gets correct SMIE indentation.
+parameters → add to dune-fields-regex next to implements (dune.el:86) so it highlights as a field (function-name-face).
+instantiate → add to dune-builtin-regex in the "Dependency specification" group (dune.el:129) so it highlights as a builtin (builtin-face).
 
 ---
 
